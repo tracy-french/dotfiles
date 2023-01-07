@@ -50,6 +50,12 @@
 ;; eglot
 (add-hook 'typescript-ts-mode 'eglot-ensure)
 
+;; formatting
+(use-package apheleia
+  :ensure t
+  :init
+  (apheleia-global-mode +1))
+
 ;; pair handling
 (electric-pair-mode 1)
 (show-paren-mode 1)
