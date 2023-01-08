@@ -70,7 +70,7 @@
 
 ;;; programming
 ;; eglot
-(add-hook 'typescript-ts-mode 'eglot-ensure)
+(add-hook 'typescript-ts-mode-hook 'eglot-ensure)
 
 ;; formatting
 (use-package apheleia
@@ -259,7 +259,6 @@
   :custom
   (doom-modeline-height 15)
   (doom-modeline-bar-width 6)
-  (doom-modeline-minor-modes t)
   (doom-modeline-buffer-file-name-style 'truncate-except-project)
   :init (doom-modeline-mode 1))
 
