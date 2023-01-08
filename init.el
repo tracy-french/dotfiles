@@ -90,6 +90,11 @@
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C-<" . mc/mark-all-like-this)))
 
+;; expand region
+(use-package expand-region
+  :ensure t
+  :bind ("C-=" . er/expand-region))
+
 ;;; projects
 ;; project handling
 (use-package projectile
