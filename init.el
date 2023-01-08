@@ -423,7 +423,6 @@
   (setq dashboard-set-file-icons t)
   (setq dashboard-set-navigator t)
   (setq dashboard-projects-backend 'projectile)
-  (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
 
   (setq dashboard-items '((recents  . 5)
                           (bookmarks . 5)
