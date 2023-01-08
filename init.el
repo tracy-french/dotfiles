@@ -15,6 +15,9 @@
 ;; remember recent files
 (recentf-mode 1)
 
+;; open files in last location
+(save-place-mode 1)
+
 ;; update buffers when files have changed
 (global-auto-revert-non-file-buffers t)
 (global-auto-revert-mode 1)
