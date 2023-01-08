@@ -4,6 +4,9 @@
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
+;;; shell
+(setenv "SHELL" (expand-file-name "~/bin/zsh"))
+
 ;;; defaults
 (set-default-coding-systems 'utf-8)
 (setq indent-tabs-mode nil) 
@@ -122,10 +125,9 @@
 (use-package git-timemachine
   :ensure t)
 
-(use-package git-gutter
-  :ensure t
-  :config
-  (global-git-gutter-mode t))
+;; terminal support
+(use-package vterm
+  :ensure t)
 
 ;;; keys
 (use-package which-key
