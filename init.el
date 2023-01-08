@@ -100,6 +100,9 @@
   :ensure t
   :bind (("C-x u" . vundo)))
 
+(use-package restclient ; https://github.com/pashky/restclient.el
+  :ensure t)
+
 ;;; projects
 ;; project handling
 (use-package projectile
