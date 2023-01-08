@@ -95,6 +95,11 @@
   :ensure t
   :bind ("C-=" . er/expand-region))
 
+;; undo/redo
+(use-package vundo
+  :ensure t
+  :bind (("C-x u" . vundo)))
+
 ;;; projects
 ;; project handling
 (use-package projectile
