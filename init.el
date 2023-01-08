@@ -12,8 +12,11 @@
 (global-display-line-numbers-mode)
 (global-set-key (kbd "C-M-u") 'universal-argument) ; C-u is used by vi to scroll
 
+;; remember recent files
+(recentf-mode 1)
+
 ;; update buffers when files have changed
-(customize-set-variable 'global-auto-revert-non-file-buffers t)
+(global-auto-revert-non-file-buffers t)
 (global-auto-revert-mode 1)
 
 ;; save command history
