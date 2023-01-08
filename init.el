@@ -20,6 +20,7 @@
 (global-auto-revert-mode 1)
 
 ;; save command history
+(setq history-length 25)
 (savehist-mode 1)
 
 ;;; macos
