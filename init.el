@@ -418,6 +418,23 @@
 
 (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*"))) ; when using emacsclient
 
+;; tabs
+(use-package centaur-tabs
+  :ensure t
+  :demand
+  :init
+  (setq centaur-tabs-enable-key-bindings t)
+  :config
+  (setq centaur-tabs-set-icons t)
+  (setq centaur-tabs-set-close-button nil)
+  (setq centaur-tabs-set-modified-marker t)
+  (centaur-tabs-mode t)
+  (centaur-tabs-group-by-projectile-project)
+  :bind
+  (:map evil-normal-state-map
+        ("g t" . centaur-tabs-forward)
+        ("g T" . centaur-tabs-backward)))
+
 ;;; file explorer
 (use-package treemacs
   :ensure t
