@@ -38,6 +38,9 @@
 (setq history-length 25)
 (savehist-mode 1)
 
+;; turn off dialogs
+(setq use-dialog-box nil)
+
 ;;; macos
 (customize-set-variable mac-right-option-modifier nil)
 (customize-set-variable mac-command-modifier 'super)
