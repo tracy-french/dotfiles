@@ -15,11 +15,23 @@
 ;; remember recent files
 (recentf-mode 1)
 
+;; keep directories clean
+(use-package no-littering
+  :ensure t)
+
+(setq auto-save-file-name-transforms
+	`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
+(add-to-list 'recentf-exclude no-littering-var-directory)
+(add-to-list 'recentf-exclude no-littering-etc-directory)
+
+(setq custom-file (no-littering-expand-etc-file-name "custom.el"))
+
 ;; open files in last location
 (save-place-mode 1)
 
 ;; update buffers when files have changed
-(global-auto-revert-non-file-buffers t)
+(setq global-auto-revert-non-file-buffers t)
 (global-auto-revert-mode 1)
 
 ;; save command history
