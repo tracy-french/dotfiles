@@ -203,7 +203,32 @@
 
          :map minibuffer-local-map
          ("M-s" . consult-history)
-         ("M-r" . consult-history)))
+         ("M-r" . consult-history))
+  :config
+  (setq completion-in-region-function #'consult-completion-in-region)
+  )
+
+;; embark
+(use-package embark
+  :ensure t
+  :bind (("C-." . embark-act)
+         ("C-;" . embark-dwim)
+         ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;;; user interface
 ;; icons
@@ -372,3 +397,33 @@
                        ((org-agenda-overriding-header "available actions")))
             (tags-todo "+CATEGORY=\"waiting\""
                        ((org-agenda-overriding-header "waiting on"))))))))
+
+;;; file explorer
+(use-package treemacs
+  :ensure t
+  :defer t
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
