@@ -119,6 +119,11 @@
 (use-package magit
   :ensure t)
 
+(use-package git-gutter
+  :ensure t
+  :config
+  (global-git-gutter-mode t))
+
 ;;; keys
 (use-package which-key
   :ensure t
