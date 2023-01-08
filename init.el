@@ -103,6 +103,9 @@
 (use-package restclient ; https://github.com/pashky/restclient.el
   :ensure t)
 
+(use-package npm
+  :ensure t)
+
 ;;; projects
 ;; project handling
 (use-package projectile
