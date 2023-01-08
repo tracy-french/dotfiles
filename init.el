@@ -398,6 +398,26 @@
             (tags-todo "+CATEGORY=\"waiting\""
                        ((org-agenda-overriding-header "waiting on"))))))))
 
+;; dashboard
+(use-package dashboard
+  :ensure t
+  :config
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-navigator t)
+  (setq dashboard-projects-backend 'projectile)
+  (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (agenda . 5)
+                          (registers . 5)))
+
+  (dashboard-setup-startup-hook))
+
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*"))) ; when using emacsclient
+
 ;;; file explorer
 (use-package treemacs
   :ensure t
