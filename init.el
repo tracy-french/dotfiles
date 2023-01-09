@@ -278,6 +278,13 @@
   (doom-modeline-buffer-file-name-style 'truncate-except-project)
   :init (doom-modeline-mode 1))
 
+(use-package nyan-mode
+  :ensure t
+  :config
+  (setq nyan-animate-nyancat t)
+  (setq nyan-wavy-trail t)
+  (nyan-mode t))
+
 ;; font
 (set-face-attribute 'default nil
                     :family "Input Mono" ; config will fail to load if font is not available
