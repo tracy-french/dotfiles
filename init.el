@@ -147,6 +147,15 @@
   :init
   (vertico-mode 1))
 
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
 ;; completion annotations
 (use-package marginalia
   :ensure t
@@ -503,3 +512,18 @@
 (use-package treemacs-magit
   :after (treemacs magit)
   :ensure t)
+
+;; snippets
+(use-package yasnippet
+  :ensure t
+  :hook ((text-mode
+          prog-mode
+          conf-mode
+          snippet-mode) . yas-minor-mode-on)
+  :init
+  (setq yas-snippet-dirs '("~/dotfiles/snippets")))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :after yasnippet)
+
