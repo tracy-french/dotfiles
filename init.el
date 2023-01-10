@@ -513,7 +513,7 @@
   :after (treemacs magit)
   :ensure t)
 
-;; snippets
+;;; snippets
 (use-package yasnippet
   :ensure t
   :hook ((text-mode
@@ -527,3 +527,119 @@
   :ensure t
   :after yasnippet)
 
+;;; avy
+(use-package avy
+  :ensure t
+  :bind (("M-j" . avy-goto-char-timer)
+         :map isearch-mode-map
+	 ("M-j" . avy-isearch)))
+
+(defun avy-action-kill-whole-line (pt)
+  (save-excursion
+    (goto-char pt)
+    (kill-whole-line))
+  (select-window
+   (cdr
+    (ring-ref avy-ring 0)))
+  t)
+
+(setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-stay
+      (alist-get ?K avy-dispatch-alist) 'avy-action-kill-whole-line)
+
+(defun avy-action-copy-whole-line (pt)
+  (save-excursion
+    (goto-char pt)
+    (cl-destructuring-bind (start . end)
+        (bounds-of-thing-at-point 'line)
+      (copy-region-as-kill start end)))
+  (select-window
+   (cdr
+    (ring-ref avy-ring 0)))
+  t)
+
+(defun avy-action-yank-whole-line (pt)
+  (avy-action-copy-whole-line pt)
+  (save-excursion (yank))
+  t)
+
+(setf (alist-get ?y avy-dispatch-alist) 'avy-action-yank
+      (alist-get ?w avy-dispatch-alist) 'avy-action-copy
+      (alist-get ?W avy-dispatch-alist) 'avy-action-copy-whole-line
+      (alist-get ?Y avy-dispatch-alist) 'avy-action-yank-whole-line)
+
+(defun avy-action-teleport-whole-line (pt)
+    (avy-action-kill-whole-line pt)
+    (save-excursion (yank)) t)
+
+(setf (alist-get ?t avy-dispatch-alist) 'avy-action-teleport
+      (alist-get ?T avy-dispatch-alist) 'avy-action-teleport-whole-line)
+
+(defun avy-action-mark-to-char (pt)
+  (activate-mark)
+  (goto-char pt))
+
+(setf (alist-get ?  avy-dispatch-alist) 'avy-action-mark-to-char)
+
+(defun avy-action-flyspell (pt)
+  (save-excursion
+    (goto-char pt)
+    (when (require 'flyspell nil t)
+      (flyspell-auto-correct-word)))
+  (select-window
+   (cdr (ring-ref avy-ring 0)))
+  t)
+
+;; Bind to semicolon (flyspell uses C-;)
+(setf (alist-get ?\; avy-dispatch-alist) 'avy-action-flyspell)
+
+(use-package dictionary
+  :ensure t)
+
+(defun dictionary-search-dwim (&optional arg)
+  "Search for definition of word at point. If region is active,
+search for contents of region instead. If called with a prefix
+argument, query for word to search."
+  (interactive "P")
+  (if arg
+      (dictionary-search nil)
+    (if (use-region-p)
+        (dictionary-search (buffer-substring-no-properties
+                            (region-beginning)
+                            (region-end)))
+      (if (thing-at-point 'word)
+          (dictionary-lookup-definition)
+        (dictionary-search-dwim '(4))))))
+
+(defun avy-action-define (pt)
+  (save-excursion
+    (goto-char pt)
+    (dictionary-search-dwim))
+  (select-window
+   (cdr (ring-ref avy-ring 0)))
+  t)
+
+(setf (alist-get ?= avy-dispatch-alist) 'dictionary-search-dwim)
+
+(use-package helpful
+  :ensure t)
+
+(defun avy-action-helpful (pt)
+  (save-excursion
+    (goto-char pt)
+    (helpful-at-point))
+  (select-window
+   (cdr (ring-ref avy-ring 0)))
+  t)
+
+(setf (alist-get ?H avy-dispatch-alist) 'avy-action-helpful)
+
+(defun avy-action-embark (pt)
+  (unwind-protect
+      (save-excursion
+        (goto-char pt)
+        (embark-act))
+    (select-window
+     (cdr (ring-ref avy-ring 0))))
+  t)
+
+(setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)
