@@ -1,645 +1,208 @@
-;;; -*- lexical-binding: t; -*-
+;;; init.el --- personal configuration -*- lexical-binding: t; -*-
 
-;;; packages
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
+;; ---------------------------------------------------------------------------
+;; navigation
+;; ---------------------------------------------------------------------------
 
-;;; shell
+(global-auto-revert-mode 1)
+;; revert dired
+(setq global-auto-revert-non-file-buffers t
+      auto-revert-verbose nil)
+(add-to-list 'global-auto-revert-ignore-modes 'Buffer-menu-mode)
+
+;; Make dired "guess" target directory for some operations, like copy to
+;; directory visited in other split buffer.
+(setq dired-dwim-target t)
+
+(setq ring-bell-function 'ignore
+      visible-bell nil)
+
+;; Highlight and allow to open http link at point in programming buffers
+;; goto-address-prog-mode only highlights links in strings and comments
+(add-hook 'prog-mode-hook 'goto-address-prog-mode)
+
+;; Highlight and follow bug references in comments and strings
+(add-hook 'prog-mode-hook 'bug-reference-prog-mode)
+
+;; Keep focus while navigating help buffers
+(setq help-window-select 't)
+
+;; Scroll compilation to first error or end
+(setq compilation-scroll-output 'first-error)
+
+;; Don't try to ping things that look like domain names
+(setq ffap-machine-p-known 'reject)
+
+;; ---------------------------------------------------------------------------
+;; mouse
+;; ---------------------------------------------------------------------------
+
+;; Mouse cursor in terminal mode
+(xterm-mouse-mode 1)
+
+(when (boundp 'mouse-wheel-scroll-amount)
+  ;; scroll two line at a time (less "jumpy" than defaults)
+  (setq mouse-wheel-scroll-amount '(2)
+        ;; don't accelerate scrolling
+        mouse-wheel-progressive-speed nil))
+
+;; ---------------------------------------------------------------------------
+;; edit
+;; ---------------------------------------------------------------------------
+
+;; Start with the *scratch* buffer in text mode (speeds up Emacs load time,
+;; because it avoids autoloads of elisp modes)
+(setq initial-major-mode 'text-mode)
+
+;; use only spaces and no tabs
+(setq indent-tabs-mode nil
+      tab-width 2)
+
+;; text
+(setq longlines-show-hard-newlines t)
+
+;; Use system trash for file deletion.
+;; This should work on Windows and Linux distros.
+;; For macOS, see the osx layer.
+(setq delete-by-moving-to-trash t)
+
+;; auto fill breaks line beyond buffer's fill-column
+(setq-default fill-column 80)
+
+;; persistent abbreviation file
+(setq abbrev-file-name "~/.emacs.d/cache/abbrev_defs")
+
+;; Save clipboard contents into kill-ring before replace them
+(setq save-interprogram-paste-before-kill t)
+
+;; Single space between sentences is more widespread than double
+(setq-default sentence-end-double-space nil)
+
+;; The C-d rebinding that most shell-like buffers inherit from
+;; comint-mode assumes non-evil configuration with its
+;; `comint-delchar-or-maybe-eof' function, so we disable it
+(with-eval-after-load 'comint
+  (define-key comint-mode-map (kbd "C-d") nil))
+
+;; ---------------------------------------------------------------------------
+;; ui
+;; ---------------------------------------------------------------------------
+
+;; important for golden-ratio to better work
+(setq window-combination-resize t)
+
+;; Show column number in mode line
+(setq column-number-mode t)
+
+;; highlight current line
+(global-hl-line-mode t)
+
+;; no blinking cursor
+(blink-cursor-mode 0)
+
+;; When emacs asks for "yes" or "no", let "y" or "n" suffice
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; draw underline lower
+(setq x-underline-at-descent-line t)
+
+;; don't let the cursor go into minibuffer prompt
+(setq minibuffer-prompt-properties
+      '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
+
+(setq ns-use-native-fullscreen t)
+
+;; ---------------------------------------------------------------------------
+;; session
+;; ---------------------------------------------------------------------------
+
+;; scratch buffer empty
+(setq initial-scratch-message nil)
+
+;; don't create backups
+(setq make-backup-files nil)
+
+;; auto save files
+(setq auto-save-default t)
+
+;; remove annoying ellipsis when printing sexp in message buffer
+(setq eval-expression-print-length nil
+      eval-expression-print-level nil)
+
+;; cache files
+(setq tramp-persistency-file-name "~/.emacs.d/tramp")
+
+;; unlock disabled commands
+(put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'erase-buffer 'disabled nil)
+(put 'scroll-left 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
+
+;; ---------------------------------------------------------------------------
+;; compilation
+;; ---------------------------------------------------------------------------
+
+;; Don't load outdated compiled files.
+(setq load-prefer-newer t)
+
+;; Suppress the *Warnings* buffer when native compilation shows warnings.
+(setq native-comp-async-report-warnings-errors 'silent)
+
+;; ---------------------------------------------------------------------------
+;; user interface
+;; ---------------------------------------------------------------------------
+
+;;; Disable UI elements early
+(push '(menu-bar-lines . 0)   default-frame-alist)
+(push '(tool-bar-lines . 0)   default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
+
+(setq menu-bar-mode nil
+      tool-bar-mode nil
+      scroll-bar-mode nil)
+
+;; ---------------------------------------------------------------------------
+;; packages
+;; ---------------------------------------------------------------------------
+
+;; install use-package is not installed
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(eval-and-compile
+  (setq use-package-always-ensure t)
+  (setq use-package-expand-minimally t)
+  (setq use-package-compute-statistics t)
+  (setq use-package-enable-imenu-support t))
+
+(eval-when-compile
+  (require 'use-package)
+  (require 'bind-key))
+
+(setq package-archives
+      '(("elpa" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "http://melpa.org/packages/")))
+
+;; ---------------------------------------------------------------------------
+;; load
+;; ---------------------------------------------------------------------------
+
+(setenv "PATH" (concat (getenv "PATH") ":/bin"))
+(setq exec-path (append exec-path '("/bin")))
+
+;; setup $PATH correctly
+(use-package exec-path-from-shell
+    :init
+  (exec-path-from-shell-initialize))
+
+;; set shell
 (setenv "SHELL" (expand-file-name "~/bin/zsh"))
 
-;;; defaults
-(set-default-coding-systems 'utf-8)
-(setq indent-tabs-mode nil) 
-(setq use-short-answers t) ; use y/n instead of yes/no
-(setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode)
-(global-set-key (kbd "C-M-u") 'universal-argument) ; C-u is used by vi to scroll
-
-;; remember recent files
-(recentf-mode 1)
-
-;; keep directories clean
-(use-package no-littering
-  :ensure t)
-
-(setq auto-save-file-name-transforms
-	`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-
-(add-to-list 'recentf-exclude no-littering-var-directory)
-(add-to-list 'recentf-exclude no-littering-etc-directory)
-
-(setq custom-file (no-littering-expand-etc-file-name "custom.el"))
-
-;; open files in last location
-(save-place-mode 1)
-
-;; update buffers when files have changed
-(setq global-auto-revert-non-file-buffers t)
-(global-auto-revert-mode 1)
-
-;; save command history
-(setq history-length 25)
-(savehist-mode 1)
-
-;; turn off dialogs
-(setq use-dialog-box nil)
-
-;;; macos
-(customize-set-variable mac-right-option-modifier nil)
-(customize-set-variable mac-command-modifier 'super)
-(customize-set-variable ns-function-modifier 'hyper)
-
-;;; window management
-(winner-mode 1)
-
-;;; vi emulation
-(use-package evil
-  :ensure t
-  :init
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1))
-
-(use-package evil-collection
-  :ensure t
-  :after evil
-  :config
-  (evil-collection-init))
-
-(use-package evil-nerd-commenter ; use M-; to comment line or region
-  :ensure t
-  :init
-  (evilnc-default-hotkeys))
-
-;;; programming
-;; eglot
-(add-hook 'typescript-ts-mode-hook 'eglot-ensure)
-
-;; formatting
-(use-package apheleia
-  :ensure t
-  :init
-  (apheleia-global-mode +1))
-
-;; pair handling
-(electric-pair-mode 1)
-(show-paren-mode 1)
-
-;; multiple cursors
-(use-package multiple-cursors
-  :ensure t
-  :bind (("C-S-c C-S-c" . mc/edit-lines)
-         ("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-previous-like-this)
-         ("C-c C-<" . mc/mark-all-like-this)))
-
-;; expand region
-(use-package expand-region
-  :ensure t
-  :bind ("C-=" . er/expand-region))
-
-;; undo/redo
-(use-package vundo
-  :ensure t
-  :bind (("C-x u" . vundo)))
-
-(use-package restclient ; https://github.com/pashky/restclient.el
-  :ensure t)
-
-(use-package npm
-  :ensure t)
-
-;;; projects
-;; project handling
-(use-package projectile
-  :ensure t
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  (projectile-mode +1))
-
-;; git integration
-(use-package magit
-  :ensure t)
-
-(use-package git-timemachine
-  :ensure t)
-
-;; terminal support
-(use-package vterm
-  :ensure t)
-
-;;; keys
-(use-package which-key
-  :ensure t
-  :config
-  (which-key-mode))
-
-;;; completion
-;; vertical completion
-(use-package vertico
-  :ensure t
-  :bind (:map vertico-map
-              ("C-j" . vertico-next)
-              ("C-k" . vertico-previous))
-  :custom
-  (vertico-cycle t)
-  :init
-  (vertico-mode 1))
-
-(use-package vertico-directory
-  :after vertico
-  :ensure nil
-  :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
-  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
-
-;; completion annotations
-(use-package marginalia
-  :ensure t
-  :custom
-  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-list nil))
-  :init
-  (marginalia-mode 1))
-
-;; fuzzy completion
-(use-package orderless
-  :ensure t
-  :init
-  (setq completion-styles '(orderless basic)
-	completion-category-defaults nil
-	completion-category-overrides '((file (styles partial-completion)))))
-
-;; completion ui
-(use-package corfu
-  :ensure t
-  :bind (("M-p" . corfu-popupinfo-scroll-down)
-	 ("M-n" . corfu-popupinfo-scroll-up)
-	 ("M-d" . corfu-popupinfo-toggle))
-  :custom
-  (corfu-cycle t)
-  (corfu-auto t)
-  (corfu-auto-prefix 2)
-  (corfu-auto-delay 0.0)
-  (corfu-echo-documentation 0.25)
-  :config
-  (eldoc-add-command #'corfu-insert)
-  :init
-  (global-corfu-mode 1)
-  (corfu-popupinfo-mode 1))
-
-;; completion at point
-(use-package cape
-  :ensure t
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
-  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
-
-(use-package consult
-  :ensure t
-  :bind (("C-c h" . consult-history)
-         ("C-c m" . consult-mode-command)
-         ("C-c k" . consult-kmacro)
-
-         ("C-x M-:" . consult-complex-command)
-         ("C-x b" . consult-buffer)
-         ("C-x 4 b" . consult-buffer-other-window)
-         ("C-x 5 b" . consult-buffer-other-frame)
-         ("C-x r b" . consult-bookmark)
-         ("C-x p b" . consult-project-buffer)
-
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)
-         ("C-M-#" . consult-register)
-         ("M-y" . consult-yank-pop)
-
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)
-         ("M-g g" . consult-goto-line)
-         ("M-g M-g" . consult-goto-line)
-         ("M-g o" . consult-outline)
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-
-         ("M-s d" . consult-find)
-         ("M-s D" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ("M-s e" . consult-isearch-history)
-
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history) 
-         ("M-s e" . consult-isearch-history) 
-         ("M-s l" . consult-line)           
-         ("M-s L" . consult-line-multi)    
-
-         :map minibuffer-local-map
-         ("M-s" . consult-history)
-         ("M-r" . consult-history))
-  :config
-  (setq completion-in-region-function #'consult-completion-in-region)
-  )
-
-;; embark
-(use-package embark
-  :ensure t
-  :bind (("C-." . embark-act)
-         ("C-;" . embark-dwim)
-         ("C-h B" . embark-bindings))
-  :init
-  (setq prefix-help-command #'embark-prefix-help-command)
-
-  :config
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
-
-(use-package embark-consult
-  :ensure t
-  :after (embark consult)
-  :demand t
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
-
-;;; user interface
-;; icons
-(use-package all-the-icons
-  :ensure t)
-
-;; mode line
-(use-package doom-modeline
-  :ensure t
-  :custom
-  (doom-modeline-height 15)
-  (doom-modeline-bar-width 6)
-  (doom-modeline-buffer-file-name-style 'truncate-except-project)
-  :init (doom-modeline-mode 1))
-
-(use-package nyan-mode
-  :ensure t
-  :config
-  (setq nyan-animate-nyancat t)
-  (setq nyan-wavy-trail t)
-  (nyan-mode t))
-
-;; font
-(set-face-attribute 'default nil
-                    :family "Input Mono" ; config will fail to load if font is not available
-                    :height 160)
-
-;; theme
-(use-package emacs
-  :init
-  (setq modus-themes-italic-constructs nil
-        modus-themes-bold-constructs nil
-
-        modus-themes-region '(bg-only accented)
-        modus-themes-hl-line '(accented)
-
-        modus-themes-mode-line '(accented borderless 8 4)
-        modus-themes-tabs-accented t
-
-        modus-themes-prompts '(background)
-        modus-themes-completions '((matches . (background))
-                                   (selection . (accented text-also))
-                                   (popup . (accented text-also)))
-
-        modus-themes-markup '(bold background italic)
-        modus-themes-syntax nil
-        modus-themes-lang-checkers '(background text-also)
-        modus-themes-paren-match '(intense)
-        modus-themes-subtle-line-numbers t
-        modus-themes-diffs 'desaturated
-        modus-themes-intense-mouseovers nil
-
-        modus-themes-links '(no-underline background)
-        modus-themes-org-blocks 'tinted-background
-        modus-themes-org-agenda
-        '((header-block . (1.0 semibold))
-          (header-date . (bold-today 1.0))
-          (event . (accented varied))
-          (scheduled . rainbow)
-          (habit . traffic-light))
-        modus-themes-headings
-        '((t . (rainbow ultrabold))))
-
-  :config
-  (load-theme 'modus-operandi)
-  :bind ("<f5>" . modus-themes-toggle))
-
-;;; org
-(setq org-agenda-files '("~/src/org/gtd/"))
-
-(use-package org
-  :bind (("C-c c" . org-capture)
-         ("C-c a" . org-agenda))
-  :config
-  (setq org-startup-folded t
-        org-startup-indented t
-        org-cycle-separator-lines 0
-        org-special-ctrl-a/e t
-        org-special-ctrl-k t
-        org-yank-adjusted-subtrees t
-        org-log-done 'time
-        org-log-into-drawer t
-        org-return-follows-link t
-        org-tags-match-list-sublevels t
-        org-src-fontify-natively t
-        org-src-preserve-indentation nil
-        org-edit-src-content-indentation 0
-        org-catch-invisible-edits 'error)
-
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "|" "DONE(d)")
-          (sequence "WAIT(w@/!)" "|" "DONE(d)")))
-  
-  (setq org-capture-templates
-        '(("i" "inbox" entry (file "~/src/org/gtd/inbox.org") "* TODO %?")))
-
-  (setq org-tag-alist
-        '((:startgrouptag)
-          ("tasks")
-          (:grouptags)
-          ("brainstorm" . ?b) ("chore". ?c) ("develop" . ?d) ("learn" . ?l) ("meet" . ?m)
-          ("mentor" . ?n) ("plan" . ?p) ("review" . ?r) ("schedule" . ?s) ("understand" . ?u)
-          ("write" . ?w)
-          (:endgrouptag)
-
-
-          (:startgrouptag)
-          ("focus")
-          (:grouptags)
-          ("shallow" . ?A) ("moderate" . ?B) ("deep" . ?C)
-          (:endgrouptag)))
-
-  ;; eisenhower matrix priorities
-  (setq org-priority-highest 1
-        org-priority-lowest 4
-        org-priority-default 4)
-
-  (setq org-agenda-custom-commands
-        '(("P" "prioritized next actions"
-	   ((agenda ""
-                    ((org-agenda-overriding-header "deadlines today")
-                     (org-agenda-span 1)
-                     (org-deadline-warning-days 1)
-                     (org-agenda-entry-types '(:deadline))))
-            (agenda ""
-                    ((org-agenda-overriding-header "scheduled today")
-                     (org-agenda-span 1)
-                     (org-agenda-entry-types '(:scheduled))))
-            (tags-todo "+PRIORITY=\"1\""
-                       ((org-agenda-overriding-header "important/urgent")))
-            (tags-todo "+PRIORITY=\"2\""
-                       ((org-agenda-overriding-header "important/not urgent")))
-            (tags-todo "+Priority=\"3\""
-                       ((org-agenda-overriding-header "not important/urgent")))
-            (tags-todo "+PRIORITY=\"4\""
-                       ((org-agenda-overriding-header "not important/not urgent")))))
-
-          ("D" "daily review"
-           ((agenda ""
-                    ((org-agenda-overriding-header "deadlines today")
-                     (org-agenda-time-grid nil)
-                     (org-agenda-span 1)
-                     (org-deadline-warning-days 1)
-                     (org-agenda-entry-types '(:deadline))))
-            (agenda ""
-                    ((org-agenda-overriding-header "scheduled today")
-                     (org-agenda-time-grid nil)
-                     (org-agenda-span 1)
-                     (org-agenda-entry-types '(:scheduled))))
-            (tags-todo "+CATEGORY=\"inbox\""
-                       ((org-agenda-overriding-header "need to be processed")))
-            (tags-todo "+CATEGORY=\"next\""
-                       ((org-agenda-overriding-header "available actions")))
-            (tags-todo "+CATEGORY=\"waiting\""
-                       ((org-agenda-overriding-header "waiting on")))))
-
-          ("W" "weekly review"
-           ((agenda ""
-                    ((org-agenda-overriding-header "deadlines this week")
-                     (org-agenda-span 7)
-                     (org-agenda-start-on-weekday 1) ;; start on Monday
-                     (org-deadline-warning-days 7)
-                     (org-agenda-entry-types '(:deadline))))
-            (agenda ""
-                    ((org-agenda-overriding-header "scheduled this week")
-                     (org-agenda-span 7)
-                     (org-agenda-start-on-weekday 1) ;; start on Monday
-                     (org-agenda-entry-types '(:scheduled))))
-            (tags-todo "+CATEGORY=\"inbox\""
-                       ((org-agenda-overriding-header "need to be processed")))
-            (tags-todo "+CATEGORY=\"next\""
-                       ((org-agenda-overriding-header "available actions")))
-            (tags-todo "+CATEGORY=\"waiting\""
-                       ((org-agenda-overriding-header "waiting on"))))))))
-
-;; dashboard
-(use-package dashboard
-  :ensure t
-  :config
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-set-navigator t)
-  (setq dashboard-projects-backend 'projectile)
-
-  (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)
-                          (registers . 5)))
-
-  (dashboard-setup-startup-hook))
-
-(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*"))) ; when using emacsclient
-
-;; tabs
-(use-package centaur-tabs
-  :ensure t
-  :demand t
-  :init
-  (setq centaur-tabs-enable-key-bindings t)
-  :config
-  (setq centaur-tabs-set-icons t)
-  (setq centaur-tabs-set-close-button nil)
-  (setq centaur-tabs-set-modified-marker t)
-  (centaur-tabs-mode t)
-  (centaur-tabs-group-by-projectile-project)
-  :bind
-  (:map evil-normal-state-map
-        ("g t" . centaur-tabs-forward)
-        ("g T" . centaur-tabs-backward)))
-
-;;; file explorer
-(use-package treemacs
-  :ensure t
-  :defer t
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t d"   . treemacs-select-directory)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-(use-package treemacs-evil
-  :after (treemacs evil)
-  :ensure t)
-
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
-
-(use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
-
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
-
-;;; snippets
-(use-package yasnippet
-  :ensure t
-  :hook ((text-mode
-          prog-mode
-          conf-mode
-          snippet-mode) . yas-minor-mode-on)
-  :init
-  (setq yas-snippet-dirs '("~/dotfiles/snippets")))
-
-(use-package yasnippet-snippets
-  :ensure t
-  :after yasnippet)
-
-;;; avy
-(use-package avy
-  :ensure t
-  :bind (("M-j" . avy-goto-char-timer)
-         :map isearch-mode-map
-	 ("M-j" . avy-isearch)))
-
-(defun avy-action-kill-whole-line (pt)
-  (save-excursion
-    (goto-char pt)
-    (kill-whole-line))
-  (select-window
-   (cdr
-    (ring-ref avy-ring 0)))
-  t)
-
-(setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-stay
-      (alist-get ?K avy-dispatch-alist) 'avy-action-kill-whole-line)
-
-(defun avy-action-copy-whole-line (pt)
-  (save-excursion
-    (goto-char pt)
-    (cl-destructuring-bind (start . end)
-        (bounds-of-thing-at-point 'line)
-      (copy-region-as-kill start end)))
-  (select-window
-   (cdr
-    (ring-ref avy-ring 0)))
-  t)
-
-(defun avy-action-yank-whole-line (pt)
-  (avy-action-copy-whole-line pt)
-  (save-excursion (yank))
-  t)
-
-(setf (alist-get ?y avy-dispatch-alist) 'avy-action-yank
-      (alist-get ?w avy-dispatch-alist) 'avy-action-copy
-      (alist-get ?W avy-dispatch-alist) 'avy-action-copy-whole-line
-      (alist-get ?Y avy-dispatch-alist) 'avy-action-yank-whole-line)
-
-(defun avy-action-teleport-whole-line (pt)
-    (avy-action-kill-whole-line pt)
-    (save-excursion (yank)) t)
-
-(setf (alist-get ?t avy-dispatch-alist) 'avy-action-teleport
-      (alist-get ?T avy-dispatch-alist) 'avy-action-teleport-whole-line)
-
-(defun avy-action-mark-to-char (pt)
-  (activate-mark)
-  (goto-char pt))
-
-(setf (alist-get ?  avy-dispatch-alist) 'avy-action-mark-to-char)
-
-(defun avy-action-flyspell (pt)
-  (save-excursion
-    (goto-char pt)
-    (when (require 'flyspell nil t)
-      (flyspell-auto-correct-word)))
-  (select-window
-   (cdr (ring-ref avy-ring 0)))
-  t)
-
-;; Bind to semicolon (flyspell uses C-;)
-(setf (alist-get ?\; avy-dispatch-alist) 'avy-action-flyspell)
-
-(use-package dictionary
-  :ensure t)
-
-(defun dictionary-search-dwim (&optional arg)
-  "Search for definition of word at point. If region is active,
-search for contents of region instead. If called with a prefix
-argument, query for word to search."
-  (interactive "P")
-  (if arg
-      (dictionary-search nil)
-    (if (use-region-p)
-        (dictionary-search (buffer-substring-no-properties
-                            (region-beginning)
-                            (region-end)))
-      (if (thing-at-point 'word)
-          (dictionary-lookup-definition)
-        (dictionary-search-dwim '(4))))))
-
-(defun avy-action-define (pt)
-  (save-excursion
-    (goto-char pt)
-    (dictionary-search-dwim))
-  (select-window
-   (cdr (ring-ref avy-ring 0)))
-  t)
-
-(setf (alist-get ?= avy-dispatch-alist) 'dictionary-search-dwim)
-
-(use-package helpful
-  :ensure t)
-
-(defun avy-action-helpful (pt)
-  (save-excursion
-    (goto-char pt)
-    (helpful-at-point))
-  (select-window
-   (cdr (ring-ref avy-ring 0)))
-  t)
-
-(setf (alist-get ?H avy-dispatch-alist) 'avy-action-helpful)
-
-(defun avy-action-embark (pt)
-  (unwind-protect
-      (save-excursion
-        (goto-char pt)
-        (embark-act))
-    (select-window
-     (cdr (ring-ref avy-ring 0))))
-  t)
-
-(setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)
+(add-to-list 'load-path "~/dotfiles/core/")
+(add-to-list 'load-path "~/dotfiles/modules/")
+
+(load-file "~/dotfiles/core/core-emacs.el")
+(load-file "~/dotfiles/modules/modules.el")
