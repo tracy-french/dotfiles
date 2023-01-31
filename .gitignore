@@ -1,3 +1,12 @@
+.cache
+auto-save-list
+eln-cache
+elpa
+etc
+straight
+transient
+var
+
 # Compiled
 *.elc
 
