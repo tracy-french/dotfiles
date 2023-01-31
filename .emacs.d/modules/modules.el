@@ -1,0 +1,28 @@
+;;; module.el --- module -*- lexical-binding: t -*-
+
+(require 'module-funcs)
+(require 'module-keys)
+(require 'module-defaults)
+
+(require 'module-code)
+(require 'module-completion)
+(require 'module-editing)
+(require 'module-editing-visual)
+(require 'module-evil)
+(require 'module-files)
+(require 'module-font)
+(require 'module-git)
+(require 'module-helpful)
+(require 'module-ibuffer)
+(require 'module-macos)
+(require 'module-modeline)
+(require 'module-navigation)
+(require 'module-org)
+(require 'module-projects)
+(require 'module-tabs)
+(require 'module-term)
+(require 'module-theme)
+(require 'module-treemacs)
+(require 'module-visual)
+
+(provide 'tf-emacs-modules)
