@@ -1076,47 +1076,19 @@ Returns a message with the count of killed buffers."
    (format "%d buffer(s) killed."
            (tf/rudekill-matching-buffers regexp internal-too))))
 
-;; advise to prevent server from closing
-
-(defvar tf-really-kill-emacs nil
-  "prevent window manager close from closing instance.")
-
-(defun tf//persistent-server-running-p ()
-  "Requires tf-really-kill-emacs to be toggled and
-dottf-persistent-server to be t"
-  (and (fboundp 'server-running-p)
-       (server-running-p)))
-
-(defadvice kill-emacs (around tf-really-exit activate)
-  "Only kill emacs if a prefix is set"
-  (if (and (not tf-really-kill-emacs)
-           (tf//persistent-server-running-p))
-      (tf/frame-killer)
-    ad-do-it))
-
-(defadvice save-buffers-kill-emacs (around tf-really-exit activate)
-  "Only kill emacs if a prefix is set"
-  (if (and (not tf-really-kill-emacs)
-           (tf//persistent-server-running-p))
-      (tf/frame-killer)
-    ad-do-it))
-
 (defun tf/save-buffers-kill-emacs ()
   "Save all changed buffers and exit Tf"
   (interactive)
-  (setq tf-really-kill-emacs t)
   (save-buffers-kill-emacs))
 
 (defun tf/kill-emacs ()
   "Lose all changes and exit Tf"
   (interactive)
-  (setq tf-really-kill-emacs t)
   (kill-emacs))
 
 (defun tf/prompt-kill-emacs ()
   "Prompt to save changed buffers and exit Tf"
   (interactive)
-  (setq tf-really-kill-emacs t)
   (save-some-buffers nil t)
   (kill-emacs))
 
@@ -1146,22 +1118,6 @@ toggling fullscreen."
     (set-frame-parameter
      nil 'fullscreen
      (unless (frame-parameter nil 'fullscreen)) 'fullscreen))))
-
-(defun tf/toggle-frame-fullscreen-non-native ()
-  "Toggle full screen using the `fullboth' frame parameter.
-Using the `fullboth' frame parameter rather than `fullscreen' is
-useful to use full screen on macOS without animations."
-  (interactive)
-  (modify-frame-parameters
-   nil
-   `((maximized
-      . ,(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-           (frame-parameter nil 'fullscreen)))
-     (fullscreen
-      . ,(if (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-             (if (eq (frame-parameter nil 'maximized) 'maximized)
-                 'maximized)
-           'fullboth)))))
 
 (defun tf/safe-revert-buffer ()
   "Prompt before reverting the file."
