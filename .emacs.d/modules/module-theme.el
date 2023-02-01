@@ -7,7 +7,7 @@
   (progn
     (setq doom-themes-treemacs-enable-variable-pitch nil
 	  doom-themes-treemacs-theme "doom-atom")
-    (load-theme 'doom-challenger-deep t)
+    (load-theme 'doom-solarized-light t)
     (doom-themes-visual-bell-config)
     (doom-themes-treemacs-config)
     (doom-themes-org-config)))
