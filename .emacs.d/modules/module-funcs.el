@@ -176,7 +176,7 @@ If not in such a search box, fall back on `Custom-newline'."
         (whitespace-cleanup)))))
 
 (defun tf//trailing-whitespace ()
-  (setq show-trailing-whitespace dottf-show-trailing-whitespace))
+  (setq show-trailing-whitespace t))
 
 (defun tf//set-whitespace-style-for-diff ()
   "Whitespace configuration for `diff-mode'"
@@ -621,7 +621,7 @@ FILENAME is deleted using `tf/delete-file' function.."
          (size (nth 7 (file-attributes filename))))
     (when (and
            (not (memq major-mode tf-large-file-modes-list))
-           size (> size (* 1024 1024 dottf-large-file-size))
+           size (> size (* 1024 1024 1000))
            (y-or-n-p (format (concat "%s is a large file, open literally to "
                                      "avoid performance issues?")
                              filename)))
@@ -1085,8 +1085,7 @@ Returns a message with the count of killed buffers."
   "Requires tf-really-kill-emacs to be toggled and
 dottf-persistent-server to be t"
   (and (fboundp 'server-running-p)
-       (server-running-p)
-       dottf-persistent-server))
+       (server-running-p)))
 
 (defadvice kill-emacs (around tf-really-exit activate)
   "Only kill emacs if a prefix is set"
@@ -1133,9 +1132,7 @@ dottf-persistent-server to be t"
   "Respect the `dottf-fullscreen-use-non-native' variable when
 toggling fullscreen."
   (interactive)
-  (if dottf-fullscreen-use-non-native
-      (tf/toggle-frame-fullscreen-non-native)
-    (toggle-frame-fullscreen)))
+  (toggle-frame-fullscreen))
 
 (defun tf/toggle-fullscreen ()
   "Toggle full screen on X11 and Carbon"
