@@ -1101,23 +1101,14 @@ Returns a message with the count of killed buffers."
      (make-frame-invisible nil 1))))
 
 (defun tf/toggle-frame-fullscreen ()
-  "Respect the `dottf-fullscreen-use-non-native' variable when
-toggling fullscreen."
   (interactive)
   (toggle-frame-fullscreen))
 
 (defun tf/toggle-fullscreen ()
-  "Toggle full screen on X11 and Carbon"
   (interactive)
-  (cond
-   ((eq window-system 'x)
-    (set-frame-parameter nil 'fullscreen
-                         (unless (frame-parameter nil 'fullscreen)
-                           'fullboth)))
-   ((eq window-system 'mac)
-    (set-frame-parameter
-     nil 'fullscreen
-     (unless (frame-parameter nil 'fullscreen)) 'fullscreen))))
+  (set-frame-parameter
+   nil 'fullscreen
+   (unless (frame-parameter nil 'fullscreen)) 'fullscreen))
 
 (defun tf/safe-revert-buffer ()
   "Prompt before reverting the file."
