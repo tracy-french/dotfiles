@@ -29,23 +29,19 @@
 (define-key minibuffer-local-map (kbd "C-p") 'previous-line-or-history-element)
 
 (use-package which-key
-  :config
+  :hook (which-key-init-buffer . (lambda ()
+				   (setq-local line-spacing 3)))
+  :init
   (progn
     (setq which-key-add-column-padding 1
-	  which-key-allow-multiple-replacements t
-	  which-key-echo-keystrokes 0.02
-	  which-key-idle-delay 0.5
-	  which-key-idle-secondary-delay 0.01
-	  which-key-max-description-length 32
 	  which-key-max-display-columns nil
 	  which-key-min-display-lines 6
 	  which-key-prevent-C-h-from-cycling t
-	  which-key-sort-order 'which-key-prefix-then-key-order
-	  which-key-sort-uppercase-first nil
-	  which-key-special-keys nil
-	  which-key-use-C-h-for-paging t
-	  which-key-allow-evil-operators t))
-  (which-key-mode))
+	  which-key-sort-order 'which-key-key-order-alpha
+	  which-key-sort-uppercase-first nil)
+  :config
+  (which-key-setup-side-window-bottom)
+  (which-key-mode)))
 
 (use-package general
   :config
@@ -374,7 +370,7 @@
    "xc"  'count-words-region
    "xU"  'upcase-region
    "xu"  'downcase-region
-   
+
    "xa"  '(:ignore t :wk "Align")
    "xa%" 'tf/align-repeat-percent
    "xa&" 'tf/align-repeat-ampersand

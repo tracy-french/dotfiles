@@ -1,7 +1,5 @@
 ;;; module-theme.el --- module -*- lexical-binding: t -*-
 
-(use-package all-the-icons)
-
 (use-package doom-themes
   :config
   (progn

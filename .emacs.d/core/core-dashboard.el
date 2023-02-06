@@ -5,12 +5,12 @@
   :init
   (progn
     (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*"))
-	  dashboard-center-content t
-	  dashboard-items '((projects . 5))
-	  dashboard-set-file-icons t
-	  dashboard-set-heading-icons t
-	  dashboard-set-init-info nil
-	  dashboard-set-footer nil))
+          dashboard-center-content t
+          dashboard-items '((projects . 5))
+          dashboard-set-file-icons t
+          dashboard-set-heading-icons t
+          dashboard-set-init-info nil
+          dashboard-set-footer nil))
   :config
   (dashboard-setup-startup-hook))
 

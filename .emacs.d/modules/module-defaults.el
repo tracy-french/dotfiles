@@ -1,8 +1,5 @@
 ;;; module-defaults.el --- module -*- lexical-binding: t -*-
 
-(setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode)
-
 (use-package bookmark
   :general
   (:states 'normal
@@ -69,24 +66,10 @@
 (use-package dired-rsync
   :general (dired-mode-map "C-c C-r" #'dired-rsync))
 
-
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
 
-(use-package ediff
-  :defer t
-  :init
-  (progn
-    ;; sane defaults
-    (setq-default
-     ediff-window-setup-function 'ediff-setup-windows-plain
-     ediff-split-window-function 'split-window-horizontally
-     ediff-merge-split-window-function 'split-window-horizontally)
-    ;; show org ediffs unfolded
-    (require 'outline)
-    (add-hook 'ediff-prepare-buffer-hook #'show-all)
-    ;; restore window layout when done
-    (add-hook 'ediff-quit-hook #'winner-undo)))
+(electric-indent-mode)
 
 (use-package eldoc
   :defer t
@@ -111,7 +94,9 @@
 	   "SPC hdK" 'describe-keymap)
   :init
   (progn
-    (advice-add 'help-do-xref :after (lambda () (setq-local tab-width 8)))))
+    (advice-add 'help-do-xref
+		:after
+		(lambda (_pos _func _args) (setq-local tab-width 8)))))
 
 (use-package image-mode
   :defer t
@@ -148,9 +133,49 @@
     (setq image-animate-loop t)))
 
 (use-package imenu
-  :defer t
   :general
   (:states 'normal
 	   "SPC ji" 'imenu))
+
+(use-package quickrun
+  :general
+  (:states 'normal
+	   "SPC xx" 'tf/quickrun)
+  :init
+  (defun tf/quickrun ()
+    (interactive)
+    (if (region-active-p)
+	(call-interactively 'quickrun-region)
+      (quickrun))))
+
+(use-package subword
+  :defer t
+  :init
+  (progn
+    (unless (category-docstring ?U)
+      (define-category ?U "Uppercase")
+      (define-category ?u "Lowercase"))
+    (modify-category-entry (cons ?A ?Z) ?U)
+    (modify-category-entry (cons ?a ?z) ?u)
+    (make-variable-buffer-local 'evil-cjk-word-separating-categories)
+
+    (defun tf//subword-enable-camel-case ()
+      "Add support for camel case to subword."
+      (if subword-mode
+	  (push '(?u . ?U) evil-cjk-word-separating-categories)
+	(setq evil-cjk-word-separating-categories
+	      (default-value 'evil-cjk-word-separating-categories))))
+
+    (add-hook 'subword-mode-hook 'tf//subword-enable-camel-case))
+    :config
+    (subword-mode))
+
+(use-package zone
+  :commands (zone zone-when-idle)
+  :general
+  (:states 'normal
+	   "SPC TZ" 'zone)
+  :init
+  (zone-when-idle 600))
 
 (provide 'module-defaults)

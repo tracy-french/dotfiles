@@ -1488,15 +1488,6 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
                 #'tf//confirm-kill-buffer
                 nil t))))
 
-(defvar tf--killed-buffer-list nil
-  "List of recently killed buffers.")
-
-(defun tf//add-buffer-to-killed-list ()
-  "If buffer is associated with a file name, add that file
-to the `killed-buffer-list' when killing the buffer."
-  (when buffer-file-name
-    (push buffer-file-name tf--killed-buffer-list)))
-
 (defun tf/reopen-killed-buffer ()
   "Reopen the most recently killed file buffer, if one exists."
   (interactive)
@@ -1529,14 +1520,6 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
   (if compilation-last-buffer
       (pop-to-buffer compilation-last-buffer)
     (user-error "There is no compilation buffer?")))
-
-;; quick run
-(defun tf/quickrun ()
-  "Call `quickrun' or `quickrun-region'"
-  (interactive)
-  (if (region-active-p)
-      (call-interactively 'quickrun-region)
-    (quickrun)))
 
 ;; randomize region
 (defun tf/randomize-words (beg end)

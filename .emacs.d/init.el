@@ -4,8 +4,8 @@
 ;; navigation
 ;; ---------------------------------------------------------------------------
 
-(global-auto-revert-mode 1)
 ;; revert dired
+(global-auto-revert-mode)
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
 (add-to-list 'global-auto-revert-ignore-modes 'Buffer-menu-mode)
@@ -13,9 +13,6 @@
 ;; Make dired "guess" target directory for some operations, like copy to
 ;; directory visited in other split buffer.
 (setq dired-dwim-target t)
-
-(setq ring-bell-function 'ignore
-      visible-bell nil)
 
 ;; Highlight and allow to open http link at point in programming buffers
 ;; goto-address-prog-mode only highlights links in strings and comments
@@ -27,25 +24,6 @@
 ;; Keep focus while navigating help buffers
 (setq help-window-select 't)
 
-;; Scroll compilation to first error or end
-(setq compilation-scroll-output 'first-error)
-
-;; Don't try to ping things that look like domain names
-(setq ffap-machine-p-known 'reject)
-
-;; ---------------------------------------------------------------------------
-;; mouse
-;; ---------------------------------------------------------------------------
-
-;; Mouse cursor in terminal mode
-(xterm-mouse-mode 1)
-
-(when (boundp 'mouse-wheel-scroll-amount)
-  ;; scroll two line at a time (less "jumpy" than defaults)
-  (setq mouse-wheel-scroll-amount '(2)
-        ;; don't accelerate scrolling
-        mouse-wheel-progressive-speed nil))
-
 ;; ---------------------------------------------------------------------------
 ;; edit
 ;; ---------------------------------------------------------------------------
@@ -53,10 +31,6 @@
 ;; Start with the *scratch* buffer in text mode (speeds up Emacs load time,
 ;; because it avoids autoloads of elisp modes)
 (setq initial-major-mode 'text-mode)
-
-;; use only spaces and no tabs
-(setq indent-tabs-mode nil
-      tab-width 2)
 
 ;; text
 (setq longlines-show-hard-newlines t)
@@ -66,23 +40,20 @@
 ;; For macOS, see the osx layer.
 (setq delete-by-moving-to-trash t)
 
-;; auto fill breaks line beyond buffer's fill-column
-(setq-default fill-column 80)
-
 ;; persistent abbreviation file
-(setq abbrev-file-name "~/.emacs.d/cache/abbrev_defs")
+(setq abbrev-file-name "~/.emacs.d/.cache/abbrev_defs")
 
 ;; Save clipboard contents into kill-ring before replace them
 (setq save-interprogram-paste-before-kill t)
-
-;; Single space between sentences is more widespread than double
-(setq-default sentence-end-double-space nil)
 
 ;; The C-d rebinding that most shell-like buffers inherit from
 ;; comint-mode assumes non-evil configuration with its
 ;; `comint-delchar-or-maybe-eof' function, so we disable it
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-d") nil))
+
+(setq shift-select-mode t)
+(delete-selection-mode +1)
 
 ;; ---------------------------------------------------------------------------
 ;; ui
@@ -91,26 +62,14 @@
 ;; important for golden-ratio to better work
 (setq window-combination-resize t)
 
-;; Show column number in mode line
-(setq column-number-mode t)
-
-;; highlight current line
-(global-hl-line-mode t)
-
-;; no blinking cursor
-(blink-cursor-mode 0)
-
-;; When emacs asks for "yes" or "no", let "y" or "n" suffice
-(fset 'yes-or-no-p 'y-or-n-p)
-
 ;; draw underline lower
 (setq x-underline-at-descent-line t)
 
-;; don't let the cursor go into minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
+;; ---------------------------------------------------------------------------
+;; auth
+;; ---------------------------------------------------------------------------
 
-(setq ns-use-native-fullscreen t)
+(setq auth-sources '("~/.authinfo"))
 
 ;; ---------------------------------------------------------------------------
 ;; session
@@ -124,13 +83,26 @@
 
 ;; auto save files
 (setq auto-save-default t)
+(setq auto-save-list-file-prefix (concat "~/.emacs.d/.cache/auto-save/"))
+
+(let ((autosave-dir "~/.emacs.d/.cache/auto-save/dist/"))
+  (setq auto-save-file-name-transforms
+	`(("\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'" ,autosave-dir t)))
+  (unless (file-exists-p autosave-dir)
+    (make-directory autosave-dir t)))
+
+(let ((autosave-dir "~/.emacs.d/.cache/auto-save/site/"))
+  (add-to-list 'auto-save-file-name-transforms
+	       `(".*" ,autosave-dir t) 'append)
+  (unless (file-exists-p autosave-dir)
+    (make-directory autosave-dir t)))
 
 ;; remove annoying ellipsis when printing sexp in message buffer
 (setq eval-expression-print-length nil
       eval-expression-print-level nil)
 
 ;; cache files
-(setq tramp-persistency-file-name "~/.emacs.d/tramp")
+(setq tramp-persistency-file-name "~/.emacs.d/.cache/tramp")
 
 ;; unlock disabled commands
 (put 'narrow-to-region 'disabled nil)
@@ -149,6 +121,10 @@
 
 ;; Suppress the *Warnings* buffer when native compilation shows warnings.
 (setq native-comp-async-report-warnings-errors 'silent)
+
+;; suppress warnings of using `cl'
+;; TODO: change usage of `cl' to `cl-lib'
+(setq byte-compile-warnings '(cl-functions))
 
 ;; ---------------------------------------------------------------------------
 ;; packages

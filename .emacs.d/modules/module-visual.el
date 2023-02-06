@@ -1,8 +1,5 @@
 ;;; module-visual.el --- module -*- lexical-binding: t -*-
 
-(use-package all-the-icons
-  :defer t)
-
 (use-package desktop
   :defer t
   :init

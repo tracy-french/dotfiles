@@ -7,8 +7,11 @@
   :group 'emacs
   :prefix 'tf-emacs-)
 
-(require 'core-dashboard)
 (require 'core-load-paths)
 (require 'core-hooks)
+(require 'core-start)
+(require 'core-ui)
+(require 'core-editor)
+(require 'core-dashboard)
 
 (provide 'tf-emacs-core)

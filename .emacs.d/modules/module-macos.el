@@ -4,17 +4,6 @@
 (customize-set-variable mac-command-modifier 'super)
 (customize-set-variable ns-function-modifier 'hyper)
 
-;;
-;;; Reasonable defaults for macOS
-
-;; Use spotlight search backend as a default for M-x locate (and helm/ivy
-;; variants thereof), since it requires no additional setup.
-(setq locate-command "mdfind")
-
-
-;;
-;;; Compatibilty fixes
-
 ;; Visit files opened outside of Emacs in existing frame, not a new one
 (setq ns-pop-up-frames nil)
 
@@ -29,22 +18,62 @@
      (require 'ns-auto-titlebar nil t)
      (ns-auto-titlebar-mode +1))
 
-;;; Packages
+(let ((gls (executable-find "gls")))
+  (when gls
+    (setq insert-dictionary-program gls)))
+
+(use-package launchctl
+  :defer t
+  :general
+  (:keymaps 'launch-ctl-mode
+	    "q" 'quit-window
+            "s" 'tabulated-list-sort
+            "g" 'launchctl-refresh
+            "n" 'launchctl-new
+            "e" 'launchctl-edit
+            "v" 'launchctl-view
+            "l" 'launchctl-load
+            "u" 'launchctl-unload
+            "r" 'launchctl-reload
+            "S" 'launchctl-start
+            "K" 'launchctl-stop
+            "R" 'launchctl-restart
+            "D" 'launchctl-remove
+            "d" 'launchctl-disable
+            "E" 'launchctl-enable
+            "i" 'launchctl-info
+            "f" 'launchctl-filter
+            "=" 'launchctl-setenv
+            "#" 'launchctl-unsetenv
+            "h" 'launchctl-help)
+  :init (add-to-list 'auto-mode-alist '("\\.plist\\'" . nxml-mode)))
+
+(use-package osx-dictionary
+  :general
+  (:states 'normal
+	   "SPC xwd" 'osx-dictionary-search-pointer)
+
+  (:keymaps 'osx-dictionary-mode
+	    "q" 'osx-dictionary-quit
+            "r" 'osx-dictionary-read-word
+            "s" 'osx-dictionary-search-input
+            "o" 'osx-dictionary-open-dictionary.app)
+
+  :commands (osx-dictionary-search-pointer
+	     osx-dictionary-search-input
+	     osx-dictionary-cli-find-or-recompile))
 
 (use-package osx-trash
-  :commands osx-trash-move-file-to-trash
-  :init
-  (progn
-    ;; Delete files to trash on macOS, as an extra layer of precaution against
-    ;; accidentally deleting wanted files.
-    (setq delete-by-moving-to-trash t)
+  :init (osx-trash-setup))
 
-    ;; Lazy load `osx-trash'
-    (when (not (fboundp 'system-move-file-to-trash))
-      (defun system-move-file-to-trash (file)
-	"Move FILE to trash."
-	(when (and (not IS-LINUX)
-		   (not (file-remote-p default-directory)))
-	  (osx-trash-move-file-to-trash file))))))
+(use-package reveal-in-osx-finder
+  :general
+  (:states 'normal
+	   "SPC bf" 'reveal-in-osx-finder))
+
+(when (fboundp 'set-fontset-font)
+  (set-fontset-font "fontset-default"
+		    '(#x1F600 . #x1F64F)
+		    (font-spec :name "Apple Color Emoji") nil 'prepend))
 
 (provide 'module-macos)

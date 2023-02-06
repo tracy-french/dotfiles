@@ -5,25 +5,10 @@
 (require 'treesit)
 
 ;; -----------------------------------------------------------------------------
-;; Tree Sitter
-;; -----------------------------------------------------------------------------
-
-(push '(bash-mode . bash-ts-mode) major-mode-remap-alist)
-(push '(css-mode . css-ts-mode) major-mode-remap-alist)
-(push '(html-mode . html-ts-mode) major-mode-remap-alist)
-(push '(javascript-mode . js-ts-mode) major-mode-remap-alist)
-(push '(js-mode . js-ts-mode) major-mode-remap-alist)
-(push '(json-mode . json-ts-mode) major-mode-remap-alist)
-(push '(js-json-mode . json-ts-mode) major-mode-remap-alist)
-(push '(typescript-mode . typescript-ts-mode) major-mode-remap-alist)
-(push '(tsx-mode . tsx-ts-mode) major-mode-remap-alist)
-
-;; -----------------------------------------------------------------------------
 ;; Formatting
 ;; -----------------------------------------------------------------------------
 
 (use-package apheleia
-  :defer t
   :general
   (:states 'normal
 	   "C-c C-f" 'apheleia-format-buffer)
@@ -32,67 +17,41 @@
 
 
 ;; -----------------------------------------------------------------------------
-;; Web
-;; -----------------------------------------------------------------------------
-
-(use-package import-js
-  :defer t)
-
-(use-package add-node-modules-path
-  :straight
-  (add-node-modules-path
-   :type git
-   :host github
-   :repo "codesuki/add-node-modules-path")
-  :defer t
-  :hook ((css-ts-mode . add-node-modules-path)
-	 (html-mode . add-node-modules-path)
-	 (js-ts-mode . add-node-modules-path)
-	 (typescript-ts-mode . add-node-modules-path)
-	 (tsx-ts-mode . add-node-modules-path)))
-
-(use-package npm-mode
-  :defer t
-  :general
-  (:states 'normal
-	   :prefix "SPC m"
-	   "n" '(:ignore t :wk "npm")
-	   "i" 'npm-mode-npm-install
-	   "r" 'npm-mode-npm-run
-	   "s" 'npm-mode-npm-install-save
-	   "d" 'npm-mode-npm-install-save-dev
-	   "n" 'npm-mode-npm-init
-	   "u" 'npm-mode-npm-uninstall
-	   "l" 'npm-mode-npm-list
-	   "p" 'npm-mode-visit-project-file)
-  :init (add-hook 'js2-mode #'npm-mode))
-
-(use-package js-doc
-  :defer t)
-
-(use-package emmet-mode
-  :defer t
-  :hook ((html-mode . emmet-mode)
-	 (css-mode . emmet-mode)
-	 (js-jsx-mode . emmet-mode)
-	 (tsx-ts-mode . emmet-mode)
-	 (web-mode . web-mode)))
-
-
-;; -----------------------------------------------------------------------------
 ;; Eglot
 ;; -----------------------------------------------------------------------------
 
+;; I'm not sure why this is needed, but it throws an error if I remove it
+(cl-defmethod project-root ((project (head eglot-project)))
+  (cdr project))
+
+(defun my-project-try-tsconfig-json (dir)
+  (when-let* ((found (locate-dominating-file dir "tsconfig.json")))
+    (cons 'eglot-project found)))
+
+(add-hook 'project-find-functions
+          'my-project-try-tsconfig-json nil nil)
+
+(add-to-list 'eglot-server-programs
+             '((typescript-ts-mode) "typescript-language-server" "--stdio"))
+
 (use-package eglot
+  :straight (:type built-in)
   :defer t
   :hook ((html-mode . eglot-ensure)
-	 (css-ts-mode . eglot-ensure)
-	 (js-jsx-mode . eglot-ensure)
-	 (js-ts-mode . eglot-ensure)
-	 (typescript-ts-mode . eglot-ensure)
-	 (tsx-ts-mode . eglot-ensure))
-  :custom (eglot-autoshutdown t)
+         (css-ts-mode . eglot-ensure)
+         (js-ts-mode . eglot-ensure)
+         (typescript-ts-mode . eglot-ensure)
+         (tsx-ts-mode . eglot-ensure))
   :init
-  (setq eglot-events-buffer-size 0))
+  (setq eglot-sync-connect 1
+        eglot-connect-timeout 10
+        eglot-autoshutdown t
+        eglot-send-changes-idle-time 0.5
+        eglot-events-buffer-size 0))
+
+(use-package consult-eglot
+  :general
+  (:keymaps 'eglot-mode-map
+            [remap xref-find-apropos] #'consult-eglot-symbols))
 
 (provide 'module-code)
