@@ -20,7 +20,6 @@
 (require 'module-navigation)
 (require 'module-org)
 (require 'module-projects)
-(require 'module-spell)
 (require 'module-tabs)
 (require 'module-term)
 (require 'module-theme)
