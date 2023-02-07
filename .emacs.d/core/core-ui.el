@@ -216,12 +216,15 @@
   :defer t
   :hook ((prog-mode conf-mode) . highlight-numbers-mode)
   :config
-  (setq highlight-numbers-generic-regexp "\\_<[[:digit:]]+\\(?:\\.[0-9]*\\)?\\_>"))
+  (setq highlight-numbers-generic-regexp
+        "\\_<[[:digit:]]+\\(?:\\.[0-9]*\\)?\\_>"))
 
 (setq image-animate-loop t)
 
 (setq rainbow-delimiters-max-face-count 4)
 
+(add-hook 'text-mode-hook #'auto-fill-mode)
+(add-hook 'prog-mode-hook #'auto-fill-mode)
 
 ;; -----------------------------------------------------------------------------
 ;; line numbers
@@ -235,6 +238,7 @@
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
 (add-hook 'conf-mode-hook #'display-line-numbers-mode)
 
+(column-number-mode t)
 
 ;; -----------------------------------------------------------------------------
 ;; bootstrap
