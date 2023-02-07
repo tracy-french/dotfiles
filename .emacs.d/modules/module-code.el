@@ -15,39 +15,91 @@
   :init
   (apheleia-global-mode +1))
 
+;; -----------------------------------------------------------------------------
+;; Syntax
+;; -----------------------------------------------------------------------------
+
+(use-package treesit
+  :straight nil
+  :init
+  (push '(css-mode . css-ts-mode) major-mode-remap-alist)
+  (push '(javascript-mode . js-ts-mode) major-mode-remap-alist)
+  (push '(js-mode . js-ts-mode) major-mode-remap-alist)
+  (push '(js-json-mode . json-ts-mode) major-mode-remap-alist)
+  (push '(python-mode . python-ts-mode) major-mode-remap-alist))
+
+(use-package bash-mode
+  :straight (:type built-in)
+  :defer t
+  :mode ("\\.sh\\'" . bash-ts-mode))
+
+(use-package js-mode
+  :straight (:type built-in)
+  :defer t
+  :mode (("\\.js\\'" . js-ts-mode)
+         ("\\.jsx\\'" . js-ts-mode))
+  :init
+  (progn
+    (setq js-indent-level 2
+          js-jsx-indent-level 2)))
+
+(use-package typescript-mode
+  :straight (:type built-in)
+  :defer t
+  :mode (("\\.ts\\'" . typescript-ts-mode)
+         ("\\.tsx\\'" . tsx-ts-mode)))
+
+(use-package json-mode
+  :straight (:type built-in)
+  :defer t
+  :mode ("\\.json\\'" . json-ts-mode))
+
+(use-package ccs-mode
+  :straight (:type built-in)
+  :defer t
+  :mode ("\\.css\\'" . css-ts-mode))
+
+(use-package yaml-mode
+  :straight (:type built-in)
+  :defer t
+  :mode (("\\.yml\\'" . yaml-ts-mode)
+         ("\\.yaml\\'" . yaml-ts-mode)))
+
 
 ;; -----------------------------------------------------------------------------
-;; Eglot
+;; linting
 ;; -----------------------------------------------------------------------------
 
-;; I'm not sure why this is needed, but it throws an error if I remove it
-(cl-defmethod project-root ((project (head eglot-project)))
-  (cdr project))
+(use-package flymake-eslint :defer t)
 
-(defun my-project-try-tsconfig-json (dir)
-  (when-let* ((found (locate-dominating-file dir "tsconfig.json")))
-    (cons 'eglot-project found)))
+(defun tf/flymake-eslint-enable-maybe ()
+  "enable `flymake-eslint' based on the project configuration."
+  (flymake-eslint-enable)
+  (setq-local flymake-eslint-project-root
+              (locate-dominating-file buffer-file-name ".eslintrc.js")))
 
-(add-hook 'project-find-functions
-          'my-project-try-tsconfig-json nil nil)
 
-(add-to-list 'eglot-server-programs
-             '((typescript-ts-mode) "typescript-language-server" "--stdio"))
+;; -----------------------------------------------------------------------------
+;; IDE
+;; -----------------------------------------------------------------------------
 
 (use-package eglot
   :straight (:type built-in)
   :defer t
-  :hook ((html-mode . eglot-ensure)
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-events-buffer-size 0)
+  :hook ((eglot-managed-mode . tf/flymake-eslint-enable-maybe)
+         (html-mode . eglot-ensure)
          (css-ts-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
-         (typescript-ts-mode . eglot-ensure)
-         (tsx-ts-mode . eglot-ensure))
+         (typescript-ts-base-mode . eglot-ensure))
   :init
-  (setq eglot-sync-connect 1
-        eglot-connect-timeout 10
-        eglot-autoshutdown t
-        eglot-send-changes-idle-time 0.5
-        eglot-events-buffer-size 0))
+  (put 'eglot-server-programs 'safe-local-variable 'listp)
+  :config
+  (add-to-list 'eglot-stay-out-of 'eldoc-documentation-strategy)
+  (put 'eglot-error 'flymake-overlay-control nil)
+  (put 'eglot-warning 'flymake-overlay-control nil))
 
 (use-package consult-eglot
   :general

@@ -155,13 +155,12 @@
 (setenv "PATH" (concat (getenv "PATH") ":/bin"))
 (setq exec-path (append exec-path '("/bin")))
 
-;; setup $PATH correctly
-(use-package exec-path-from-shell
-  :init
-  (exec-path-from-shell-initialize))
-
 ;; set shell
 (setenv "SHELL" (expand-file-name "~/bin/zsh"))
+
+;; setup $PATH correctly
+(use-package exec-path-from-shell
+  :hook (after-init . exec-path-from-shell-initialize))
 
 (add-to-list 'load-path "~/.emacs.d/core/")
 (add-to-list 'load-path "~/.emacs.d/modules/")
