@@ -106,4 +106,17 @@
   (:keymaps 'eglot-mode-map
             [remap xref-find-apropos] #'consult-eglot-symbols))
 
+;; -----------------------------------------------------------------------------
+;; Copilot 
+;; -----------------------------------------------------------------------------
+
+;; https://github.com/zerolfx/copilot.el
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :ensure t
+  :hook (prog-mode . copilot-mode)
+  :general
+  (:states 'insert
+           "TAB" 'copilot-accept-completion))
+
 (provide 'module-code)
