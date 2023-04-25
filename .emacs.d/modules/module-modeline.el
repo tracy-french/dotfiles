@@ -16,11 +16,4 @@
     (display-time-mode 1)
     (doom-modeline-mode)))
 
-(use-package fancy-battery
-  :defer t
-  :init
-  (progn
-    (setq fancy-batter-show-percentage t)
-    (fancy-battery-mode)))
-
 (provide 'module-modeline)
