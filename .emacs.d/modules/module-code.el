@@ -116,7 +116,8 @@
   :ensure t
   :hook (prog-mode . copilot-mode)
   :general
-  (:states 'insert
-           "TAB" 'copilot-accept-completion))
+  (:keymaps 'copilot-completion-map
+            "<tab>" 'copilot-accept-completion
+            "TAB" 'copilot-accept-completion))
 
 (provide 'module-code)
