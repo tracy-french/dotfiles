@@ -11,6 +11,7 @@
 (require 'module-git)
 (require 'module-macos)
 (require 'module-modeline)
+(require 'module-tabs)
 (require 'module-theme)
 
 (provide 'tf-emacs-modules)
