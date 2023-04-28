@@ -14,16 +14,7 @@
 ;; edit
 ;; ---------------------------------------------------------------------------
 
-;; Start with the *scratch* buffer in text mode (speeds up Emacs load time,
-;; because it avoids autoloads of elisp modes)
-(setq initial-major-mode 'text-mode)
-
-;; ---------------------------------------------------------------------------
-;; session
-;; ---------------------------------------------------------------------------
-
-;; scratch buffer empty
-(setq initial-scratch-message nil)
+(setq initial-major-mode 'fundamental-mode)
 
 ;; ---------------------------------------------------------------------------
 ;; compilation
