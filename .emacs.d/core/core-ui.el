@@ -33,6 +33,7 @@
 
 (blink-cursor-mode -1)
 
+;; don't blink matching paren at point
 (setq blink-matching-paren nil)
 
 (setq x-stretch-cursor nil)
@@ -42,6 +43,7 @@
 ;; fringes
 ;; -----------------------------------------------------------------------------
 
+;; less visual noise
 (setq indicate-buffer-boundaries nil
       indicate-empty-lines nil)
 
@@ -63,7 +65,6 @@
 (setq window-divider-default-places t
       window-divider-default-bottom-width 1
       window-divider-default-right-width 1)
-(add-hook 'tf/init-ui-hook #'window-divider-mode)
 
 ;; favor vertical splits
 (setq split-width-threshold 160
@@ -82,12 +83,36 @@
 
 (setq use-short-answers t)
 
+;; keep cursor out of readonly portions of the minibuffer
+(setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+
+;; -----------------------------------------------------------------------------
+;; packages
+;; -----------------------------------------------------------------------------
+
 (use-package hl-line
   :defer t
   :config (global-hl-line-mode))
 
+;; undo/redo changes to Emacs' window layout
+(use-package winner
+  :preface (defvar winner-dont-bind-my-keys t) 
+  :init
+  (winner-mode +1))
+
 (use-package all-the-icons
-  :defer t)
+   :commands (all-the-icons-octicon
+             all-the-icons-faicon
+             all-the-icons-fileicon
+             all-the-icons-wicon
+             all-the-icons-material
+             all-the-icons-alltheicon))
+
+(use-package highlight-numbers
+  :hook ((prog-mode conf-mode) . highlight-numbers-mode)
+  :config (setq highlight-numbers-generic-regexp "\\_<[[:digit:]]+\\(?:\\.[0-9]*\\)?\\_>"))
 
 ;; -----------------------------------------------------------------------------
 ;; line numbers
