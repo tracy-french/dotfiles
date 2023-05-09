@@ -27,6 +27,10 @@
 
 (add-hook 'text-mode-hook #'visual-line-mode)
 
+(show-paren-mode t)
+
+(electric-pair-mode t)
+
 (use-package helpful
   :commands helpful--read-symbol
   :hook (helpful-mode . visual-line-mode)
