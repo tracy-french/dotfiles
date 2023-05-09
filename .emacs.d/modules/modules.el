@@ -6,6 +6,7 @@
 (require 'module-completion)
 (require 'module-editing-visual)
 (require 'module-evil)
+(require 'module-explorer)
 (require 'module-files)
 (require 'module-font)
 (require 'module-git)
