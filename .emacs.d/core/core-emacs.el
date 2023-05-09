@@ -5,5 +5,6 @@
 (require 'core-start)
 (require 'core-ui)
 (require 'core-editor)
+(require 'core-projects)
 
 (provide 'tf-emacs-core)
