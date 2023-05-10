@@ -3,6 +3,9 @@
 ;; https://github.com/Alexander-Miller/treemacs
 (use-package treemacs
   :defer t
+  :general
+  (:states 'normal
+           "SPC f e" 'treemacs-select-window)
   :init
   (setq treemacs-follow-after-init t
         treemacs-is-never-other-window t
