@@ -86,6 +86,11 @@
 (use-package eglot
   :straight (:type built-in)
   :defer t
+  :general
+  (:states 'normal
+           "SPC c" '(:ignore t :which-key "code")
+           "SPC c s" '(eglot :which-key "server")
+           "SPC c r" '(eglot-rename :which-key "rename"))
   :custom
   (eglot-autoshutdown t)
   (eglot-events-buffer-size 0)
