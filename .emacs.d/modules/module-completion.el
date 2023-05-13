@@ -92,6 +92,8 @@
   (:keymaps 'minibuffer-local-map
 	    :override t
 	    "C-r" 'consult-history)
+  (:states 'normal
+     "C-/" 'consult-line)
   :init (setq completion-in-region-function #'consult-completion-in-region))
 
 ;; act at point
