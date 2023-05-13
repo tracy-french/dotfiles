@@ -12,4 +12,8 @@
   :defer t
   :hook (ibuffer . ibuffer-vc-set-filter-groups-by-vc-root))
 
+(use-package all-the-icons-ibuffer
+  :ensure t
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
+
 (provide 'module-buffers)
