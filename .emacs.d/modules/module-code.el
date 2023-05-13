@@ -78,6 +78,15 @@
   (setq-local flymake-eslint-project-root
               (locate-dominating-file buffer-file-name ".eslintrc.js")))
 
+(use-package flymake
+  :straight (:type built-in)
+  :defer t
+  :general
+  (:states 'normal
+           "SPC e" '(:ignore t :which-key "errors")
+           "SPC e n" '(flymake-goto-next-error :which-key "next")
+           "SPC e p" '(flymake-goto-prev-error :which-key "prev")))
+
 
 ;; -----------------------------------------------------------------------------
 ;; IDE
