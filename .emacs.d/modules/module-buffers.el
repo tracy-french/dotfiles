@@ -16,4 +16,9 @@
   :ensure t
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
+(use-package consult
+  :general
+  (:states 'normal
+           "SPC b b" 'consult-buffer))
+
 (provide 'module-buffers)
