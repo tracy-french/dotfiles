@@ -98,8 +98,11 @@
   :general
   (:states 'normal
            "SPC c" '(:ignore t :which-key "code")
+           "SPC c a" '(eglot-code-actions :which-key "actions")
+           "SPC c i" '(eglot-find-implementation :which-key "implementation")
+           "SPC c r" '(eglot-rename :which-key "rename")
            "SPC c s" '(eglot :which-key "server")
-           "SPC c r" '(eglot-rename :which-key "rename"))
+           "SPC c t" '(eglot-find-typeDefinition :which-key "type definition"))
   :custom
   (eglot-autoshutdown t)
   (eglot-events-buffer-size 0)
