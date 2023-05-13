@@ -123,6 +123,11 @@
   (:keymaps 'eglot-mode-map
             [remap xref-find-apropos] #'consult-eglot-symbols))
 
+(use-package consult
+  :general
+  (:keymaps 'normal
+            "SPC c i" '(consult-imenu :which-key "imenu")))
+
 ;; -----------------------------------------------------------------------------
 ;; Copilot 
 ;; -----------------------------------------------------------------------------
