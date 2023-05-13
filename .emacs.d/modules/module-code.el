@@ -15,6 +15,10 @@
   :init
   (apheleia-global-mode +1))
 
+(use-package aggressive-indent
+  :defer t
+  :hook (prog-mode . aggressive-indent-mode))
+
 ;; -----------------------------------------------------------------------------
 ;; Syntax
 ;; -----------------------------------------------------------------------------
@@ -127,6 +131,7 @@
   :general
   (:keymaps 'normal
             "SPC c i" '(consult-imenu :which-key "imenu")))
+
 
 ;; -----------------------------------------------------------------------------
 ;; Copilot 
