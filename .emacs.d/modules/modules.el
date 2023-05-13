@@ -2,6 +2,7 @@
 
 (require 'module-keys)
 
+(require 'module-buffers)
 (require 'module-code)
 (require 'module-completion)
 (require 'module-editing-visual)
