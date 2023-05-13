@@ -10,4 +10,10 @@
   ;; prevent customization litter
   (setq custom-file (no-littering-expand-etc-file-name "custom.el")))
 
+(use-package general
+  :general
+  (:states 'normal
+           "SPC f" '(:ignore t :which-key "files")
+           "SPC f f" 'find-file))
+
 (provide 'module-files)
