@@ -8,4 +8,8 @@
            "SPC b" '(:ignore t :which-key "buffers")
            "SPC b i" 'ibuffer))
 
+(use-package ibuffer-projectile
+  :defer t
+  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
+
 (provide 'module-buffers)
