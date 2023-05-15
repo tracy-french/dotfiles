@@ -18,4 +18,12 @@
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
+(use-package general
+  :general
+  (:states 'normal
+           "SPC g" '(:ignore t :which-key "git")
+           "SPC g f" '(forge-dispatch :which-key "forge")
+           "SPC g m" '(magit-dispatch :which-key "magit")
+           "SPC g s" '(magit-status :which-key "status")))
+
 (provide 'module-git)
