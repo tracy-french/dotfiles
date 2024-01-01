@@ -767,8 +767,19 @@
               (locate-dominating-file buffer-file-name ".eslintrc.js")))
 
 ;; -----------------------------------------------------------------------------
-;; IDE
+;; Code
 ;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "c" '(:ignore t :wk "Code")
+           "ca" '(eglot-code-actions :wk "Act at point")
+           "cf" '(apheleia-format-buffer :wk "Format buffer")
+           "ci" '(eglot-find-implementation :wk "Find implementation at point")
+           "ct" '(eglot-find-typeDefinition :wk "Find type definition at point")
+           "cR" '(eglot-rename :wk "Rename at point")))
 
 (use-package eglot
   :straight (:type built-in)
