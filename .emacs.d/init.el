@@ -194,10 +194,8 @@
 ;; Evil everywhere
 (use-package evil-collection
   :after evil
-  :custom
-  (evil-collection-setup-minibuffer t)
-  :config
-  (evil-collection-init))
+  :custom (evil-collection-setup-minibuffer t)
+  :init (evil-collection-init))
 
 (use-package evil-nerd-commenter
   :init
@@ -808,50 +806,9 @@
   :custom (magit-bury-buffer-function #'magit-restore-window-configuration)
   :general
   (:states 'normal
-	         "SPC gb" '(magit-blame :wk "Blame")
-	         "SPC gc" '(magit-clone :wk "Clone")
-           "SPC gi" '(magit-init :wk "Init")
-           "SPC gL" 'magit-list-repositories
-           "SPC gm" 'magit-dispatch
-           "SPC gs" '(magit-status :wk "Status")
-           "SPC gS" '(magit-stage-file :wk "Stage file")
-           "SPC gU" '(magit-unstage-file :wk "Unstage file")
-
-	         "SPC gf" '(:ignore t :wk "File")
-	         "SPC gfF" 'magit-find-file
-           "SPC gfl" 'magit-log-buffer-file
-           "SPC gfd" 'magit-diff
-           "SPC gfm" 'magit-file-dispatch)
-
-  (:keymaps 'magit-repolist-mode-map
-	          "SPC gr" 'magit-list-repositories
-	          "SPC RET" 'magit-repolist-status)
-
-  (:states '(normal motion)
-	         :keymaps 'with-editor-mode-map
-	         "SPC mm" 'with-editor-finish
-	         "SPC ma" 'with-editor-cancel
-	         "SPC mc" 'with-editor-finish
-	         "SPC mk" 'with-editor-cancel
-	         :keymaps 'magit-log-select-mode-map
-	         "SPC mm" 'magit-log-select-pick
-	         "SPC ma" 'magit-log-select-quit
-	         "SPC mc" 'magit-log-select-pick
-	         "SPC mk" 'magit-log-select-quit)
-
-  (:keymaps 'magit-status-mode-map
-	          "gf" '(:wk "jump-to-unpulled")
-	          "gp" '(:wk "jump-to-unpushed"))
-
-  (:states 'normal
-	         :keymaps 'magit-blame-read-only-mode-map
-	         "RET" 'magit-show-commit)
-
-  :init
-  (progn
-    (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")
-	        magit-display-buffer-function
-	        'magit-display-buffer-fullframe-status-v1)))
+           :prefix "SPC"
+           "g" '(:ignore t :mk "Git")
+           "gs" '(magit-status :wk "Status")))
 
 (use-package magit-delta
   :hook (magit-mode . magit-delta-mode))
