@@ -868,3 +868,40 @@
 
 (use-package magit-todos
   :hook (magit-mode . magit-todos-mode))
+
+;; -----------------------------------------------------------------------------
+;; Validation
+;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "v" '(:ignore t :wk "Validate")
+           "vt" '(:ignore t :wk "Test")
+           "vtt" '(jest-run-all-tests :wk "Run all tests")
+           "vtf" '(jest-run-tests-for-file :wk "Run tests for file")
+           "vtp" '(jest-run-test-at-point :wk "Run test at point")))
+
+(defun jest-run-all-tests ()
+  "Run all tests for a project"
+  (interactive)
+  (async-shell-command "npx jest")
+  (message "Running tests..."))
+
+(defun jest-run-tests-for-file ()
+  "Run tests for a file"
+  (interactive)
+  (let* ((file (buffer-file-name))
+         (command (concat "npx jest " file)))
+    (async-shell-command command)
+    (message "Running tests...")))
+
+(defun jest-run-test-at-point ()
+  "Run test at point"
+  (interactive)
+  (let* ((file (buffer-file-name))
+         (test-name (thing-at-point 'string))
+         (command (concat "npx jest " file " -t " test-name)))
+    (async-shell-command command)
+    (message "Running test...")))
