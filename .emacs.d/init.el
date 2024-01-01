@@ -827,6 +827,21 @@
   :hook (magit-mode . magit-todos-mode))
 
 ;; -----------------------------------------------------------------------------
+;; Shell
+;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "s" '(:ignore t :wk "Shell")
+           "st" '(vterm :wk "Open terminal")
+           "so" '(vterm-other-window :wk "Open terminal other window")
+           "s!" '(async-shell-command :wk "Run shell command")))
+
+(use-package vterm)
+
+;; -----------------------------------------------------------------------------
 ;; Validation
 ;; -----------------------------------------------------------------------------
 
