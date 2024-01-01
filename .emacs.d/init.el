@@ -188,9 +188,6 @@
 
   (evil-set-undo-system 'undo-redo)
 
-  ;; Use C-g to return to normal mode
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-
   ;; Use C-M-u for the universal argument instead of C-u
   (keymap-global-set "C-M-u" 'universal-argument))
 
@@ -379,6 +376,7 @@
 (add-to-list 'load-path
 	           (expand-file-name "straight/build/corfu/extensions"
 			                         straight-base-dir))
+
 ;; completion ui
 (use-package corfu
   :general
@@ -438,17 +436,21 @@
 ;; Help
 ;; -----------------------------------------------------------------------------
 
-(use-package helpful
-  :commands helpful--read-symbol
-  :hook (helpful-mode . visual-line-mode)
-  :init
-  (setq apropos-do-all t)
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "h" '(:ignore t :wk "Help")
+           "ha" '(apropos :wk "Apropos")
+           "hc" '(helpful-command :wk "Describe command")
+           "hf" '(helpful-function :wk "Describe function")
+           "hi" '(info :wk "Emacs documentation")
+           "hk" '(helpful-key :wk "Describe key")
+           "hm" '(helpful-mode :wk "Describe mode")
+           "hs" '(helpful-symbol :wk "Describe symbol")
+           "hv" '(helpful-variable :wk "Describe variable")))
 
-  (global-set-key [remap describe-function] #'helpful-callable)
-  (global-set-key [remap describe-command]  #'helpful-command)
-  (global-set-key [remap describe-variable] #'helpful-variable)
-  (global-set-key [remap describe-key]      #'helpful-key)
-  (global-set-key [remap describe-symbol]   #'helpful-symbol))
+(use-package helpful)
 
 ;; -----------------------------------------------------------------------------
 ;; Font
@@ -458,8 +460,30 @@
  'default nil :family "Input Mono" :height 180)
 
 ;; -----------------------------------------------------------------------------
+;; Commands
+;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "SPC" '(execute-extended-command :wk "Execute command")))
+
+;; -----------------------------------------------------------------------------
 ;; Files
 ;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "f" '(:ignore t :wk "Files")
+           "ff" '(find-file :wk "Find file")
+           "fl" '(load-file :wk "Load file")
+           "fr" '(consult-recent-file :wk "Find recent file")
+           "fC" '(copy-file :wk "Copy file")
+           "fD" '(delete-file :wk "Delete file")
+           "fR" '(rename-file :wk "Rename file")))
 
 ;; keep directories clean of litter
 (use-package no-littering
@@ -470,6 +494,60 @@
 
   ;; prevent customization litter
   (setq custom-file (no-littering-expand-etc-file-name "custom.el")))
+
+;; -----------------------------------------------------------------------------
+;; Buffers
+;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "b" '(:ignore t :wk "Buffers")
+           "bl" '(ibuffer :wk "List buffers")
+           "bk" '(kill-buffer :wk "Kill buffer")
+           "bb" '(consult-buffer :wk "Switch to open buffer")
+           "bt" '(consult-buffer-other-tab :wk "Open buffer in other tab")
+           "bw" '(consult-buffer-other-window :wk "Open buffer in other window")))
+
+;; -----------------------------------------------------------------------------
+;; Windows
+;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "w" '(:ignore t :wk "Windows")
+           "w0" '(delete-window :wk "Delete window")
+           "w1" '(delete-other-windows :wk "Delete other windows")
+           "wh" '(split-window-vertically :wk "Split window horizontal")
+           "wv" '(split-window-horizontally :wk "Split window vertical")
+           "wn" '(evil-window-next :wk "Next window")
+           "wp" '(evil-window-prev :wk "Previous window")
+           "wm" '(minimize-window :wk "Minimize window")
+           "wM" '(maximize-window :wk "Maximize window")
+           "w=" '(balance-windows :wk "Balance windows")))
+
+;; -----------------------------------------------------------------------------
+;; Tabs
+;; -----------------------------------------------------------------------------
+
+(use-package emacs
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "t" '(:ignore t :wk "Tabs")
+           "tl" '(tab-last :wk "Last tab (ARG)")
+           "tn" '(tab-next :wk "Next tab (ARG)")
+           "tp" '(tab-previous :wk "Previous tab (ARG)")
+           "ts" '(tab-select :wk "Select tab by ARG")
+           "tm" '(tab-move :wk "Move tab by ARG")
+           "tM" '(tab-move-to :wk "Move tab to ARG")
+           "tC" '(tab-new :wk "Create tab")
+           "tD" '(tab-close :wk "Delete tab")
+           "tU" '(tab-undo :wk "Restore last deleted tab")
+           "tR" '(tab-rename :wk "Rename tab")))
 
 ;; -----------------------------------------------------------------------------
 ;; Theme
@@ -512,53 +590,6 @@
   (nyan-mode))
 
 ;; -----------------------------------------------------------------------------
-;; Tabs
-;; -----------------------------------------------------------------------------
-
-(use-package centaur-tabs
-  :demand
-  :hook
-  (term-mode . centaur-tabs-local-mode)
-  (calendar-mode . centaur-tabs-local-mode)
-  (org-agenda-mode . centaur-tabs-local-mode)
-  :init (setq centaur-tabs-enable-key-bindings t)
-  :config
-  (setq centaur-tabs-style "bar"
-	      centaur-tabs-height 32
-	      centaur-tabs-set-icons t
-	      centaur-tabs-gray-out-icons 'buffer
-        centaur-tabs-show-new-tab-button t
-        centaur-tabs-set-modified-marker t
-	      centaur-tabs-close-button "✕"
-	      centaur-tabs-modified-marker "•"
-	      centaur-tabs-cycle-scope 'tabs
-	      centaur-tabs-show-navigation-buttons t
-	      centaur-tabs-set-bar 'under
-	      centaur-tabs-show-count nil
-	      x-underline-at-descent-line t
-	      centaur-tabs-left-edge-margin nil)
-  (centaur-tabs-change-fonts (face-attribute 'default :font) 110)
-  (centaur-tabs-headline-match)
-  (centaur-tabs-mode t)
-  (setq uniquify-separator "/"
-	      uniquify-buffer-name-style 'forward)
-
-  (let ((project-name (cdr (project-current))))
-    (when (listp project-name)
-      (setq project-name (cadr project-name)))
-    (if project-name
-        (format "Project: %s" (expand-file-name project-name))
-      centaur-tabs-common-group-name))
-  :general
-  (:states 'normal
-	         "g t" 'centaur-tabs-forward
-	         "g T" 'centaur-tabs-backward
-	         "g C-t" 'centaur-tabs-move-current-tab-to-right
-	         "g C-S-t" 'centaur-tabs-move-current-tab-to-left
-	         "C-c t p" 'centaur-tabs-group-by-projectile-project
-	         "C-c t g" 'centaur-tabs-group-buffer-groups))
-
-;; -----------------------------------------------------------------------------
 ;; File tree
 ;; -----------------------------------------------------------------------------
 
@@ -572,35 +603,7 @@
   :general
   (:states 'normal
 	         :prefix "SPC"
-	         "f" '(:ignore t :wk "files")
-	         "f t"   'treemacs
-	         "f B"   'treemacs-bookmark
-	         "f T"   'treemacs-find-file
-
-	         "p"   '(:ignore t :wk "project")
-	         "p t" '(tf/treemacs-project-toggle :wk "open project in file tree"))
-
-  (:keymaps 'treemacs-mode
-	          :states 'normal
-	          "c"         '(:wk "treemacs-create")
-	          "o"         '(:wk "treemacs-visit-node")
-	          "oa"        '(:wk "treemacs-visit-node-ace")
-	          "t"         '(:wk "treemacs-toggles")
-	          "y"         '(:wk "treemacs-copy")
-	          "C-c C-p"   '(:wk "treemacs-projects")
-	          "C-C C-p c" '(:wk "treemacs-projects-collapse"))
-  :init
-  (defun tf/treemacs-project-toggle ()
-    "toggle and add the current project to treemacs if not already added"
-    (interactive)
-    (if (eq (treemacs-current-visibility) 'visible)
-	      (delete-window (treemacs-get-local-window))
-	    (let ((path (projectile-ensure-project (projectile-project-root)))
-	          (name (projectile-project-name)))
-	      (unless (treemacs-current-workspace)
-	        (treemacs--find-workspace))
-	      (treemacs-do-add-project-to-workspace path name)
-	      (treemacs-select-window))))
+	         "ft"   'treemacs)
   :config
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
@@ -865,16 +868,3 @@
 
 (use-package magit-todos
   :hook (magit-mode . magit-todos-mode))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("7964b513f8a2bb14803e717e0ac0123f100fb92160dcf4a467f530868ebaae3e" default)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
