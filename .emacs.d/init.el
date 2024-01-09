@@ -455,7 +455,7 @@
 ;; -----------------------------------------------------------------------------
 
 (set-face-attribute
- 'default nil :family "Input Mono" :height 180)
+ 'default nil :family "MonaspiceKr NF" :height 160)
 
 ;; -----------------------------------------------------------------------------
 ;; Commands
